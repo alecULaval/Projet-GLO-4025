@@ -1,7 +1,5 @@
 import json
-
-print("Hello World!")
-
+import pymongo
 
 from flask import Flask
 
@@ -20,4 +18,15 @@ def get_heartbeat():
 
 
 if __name__ == '__main__':
+
+    mongo_client= pymongo.MongoClient()
+    mongo_databse = mongo_client["restaurants"]
+    restos = mongo_databse["restaurants"]
+
+    test_restaurant = {"name": "Benny", "address": "Whatever"}
+
+    x = restos.insert_one(test_restaurant)
+
+    print(restos.find_one())
+
     app.run(port=80)
