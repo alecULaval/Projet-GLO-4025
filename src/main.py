@@ -67,9 +67,11 @@ def create_mongodb_database():
 
 
 def create_neo4j_database():
-    conn = Neo4jConnection(uri="bolt://52.87.205.91:7687",
+    conn = Neo4jConnection(uri="bolt://127.0.0.1:80/",
                            user="neo4j",
                            pwd="difficulties-pushup-gaps")
+
+    print('Neo4j connection ... created ?')
     return conn
 
 
