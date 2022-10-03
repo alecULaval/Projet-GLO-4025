@@ -1,7 +1,10 @@
-# compose_flask/app.py
 import json
 from flask import Flask
 from redis import Redis
+
+# import numpy
+# import pymongo
+# from neo4j import GraphDatabase
 
 app = Flask(__name__)
 redis = Redis(host='redis', port=6379)
@@ -12,6 +15,7 @@ class Neo4jConnection:
     def __init__(self, uri, user, pwd):
         self.__uri = uri
         self.__user = user
+        
         self.__pwd = pwd
         self.__driver = None
         try:
@@ -49,19 +53,6 @@ def get_heartbeat():
 
     return json.dumps(ville_choisie_temporaire)
 
-
-def create_mongodb_database():
-    mongo_client= pymongo.MongoClient()
-    mongo_databse = mongo_client["restaurants"]
-    restos = mongo_databse["restaurants"]
-
-    test_restaurant = {"name": "Benny", "address": "Whatever"}
-
-    x = restos.insert_one(test_restaurant)
-
-    print("MONGODB: {ex}".format(ex=restos.find_one()))
-
-
 def create_neo4j_database():
     conn = Neo4jConnection(uri="bolt://127.0.0.1:80/",
                            user="neo4j",
@@ -72,10 +63,16 @@ def create_neo4j_database():
 """
 
 """
-@app.route('/')
-def hello():
-    redis.incr('hits')
-    return 'This Compose/Flask demo has been viewed %s time(s).' % redis.get('hits')
+def create_mongodb_database():
+    mongo_client = pymongo.MongoClient()
+    mongo_databse = mongo_client["restaurants"]
+    restos = mongo_databse["restaurants"]
+
+    test_restaurant = {"name": "Benny", "address": "Whatever"}
+
+    x = restos.insert_one(test_restaurant)
+
+    print("MONGODB: {ex}".format(ex=restos.find_one()))
 """
 
 
@@ -89,6 +86,6 @@ def heartbeat():
 
 
 if __name__ == "__main__":
-    #test = create_neo4j_database()
-    #create_mongodb_database()
-    app.run(host="0.0.0.0", debug=True)
+    # test = create_neo4j_database()
+    # create_mongodb_database()
+    app.run(host="0.0.0.0", debug=True, port=80)
