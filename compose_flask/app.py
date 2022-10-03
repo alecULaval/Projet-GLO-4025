@@ -78,11 +78,11 @@ def create_mongodb_database():
 
 @app.route('/heartbeat', methods=["GET"])
 def heartbeat():
-    ville_choisie_temporaire = {
-        "villeChoisie": "Sherbrooke"
+    ville_choisie = {
+        "villeChoisie": "Toronto"
     }
 
-    return json.dumps(ville_choisie_temporaire)
+    return json.dumps(ville_choisie)
 
 
 if __name__ == "__main__":
