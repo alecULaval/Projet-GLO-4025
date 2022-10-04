@@ -7,6 +7,10 @@ services:
         volumes:
             - .:/code
         depends_on:
-            - redis
-    redis:
-        image: redis
+            - mongo
+            - neo4j
+
+    mongo:
+        image: mongo
+    neo4j:
+        image: neo4j
