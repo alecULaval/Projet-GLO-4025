@@ -7,7 +7,6 @@ from compose_flask.neo4jdb import create_neo4j_database
 app = Flask(__name__)
 
 
-
 @app.route('/heartbeat', methods=["GET"])
 def heartbeat():
     ville_choisie = {
