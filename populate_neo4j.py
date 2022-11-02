@@ -36,8 +36,9 @@ def load_csv_to_restaurant() -> List[Restaurant]:
 
     with open('restaurant_dataset.csv', 'r') as file:
         reader = csv.reader(file)
+        next(reader)
         for row in reader:
-            restaurants.append(Restaurant(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
+            restaurants_data.append(Restaurant(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
         return restaurants_data
 
 
@@ -50,9 +51,10 @@ for restaurant in restaurants:
     restaurant_node = Node("Restaurant", address=restaurant.address, name=restaurant.name, phone=restaurant.phone,
                            price_range=restaurant.price_range, website=restaurant.website, url=restaurant.url,
                            latitude=restaurant.latitude, longitude=restaurant.longitude)
-    type_node = Node("Type", nom=restaurant.type)
-    restaurant_graph.create(Relationship(restaurant_node, "category_is", type_node))
+    type_node = Node("Type", name=restaurant.type)
     restaurant_graph.create(restaurant_node)
-    restaurant_graph.create(type_node)
+    restaurant_graph.merge(type_node, primary_label="Type", primary_key="name")
+    restaurant_graph.create(Relationship(restaurant_node, "category_is", type_node))
+
 
 graph.commit(restaurant_graph)
