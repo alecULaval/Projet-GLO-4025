@@ -32,7 +32,6 @@ class Neo4jConnection:
         return response
 
 
-
 def create_neo4j_database():
     conn = Neo4jConnection(uri="bolt://127.0.0.1:80/",
                            user="neo4j",
