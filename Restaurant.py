@@ -7,7 +7,6 @@ class Restaurant:
     address: str
     name: str
     phone: str
-    price: str
     price_range: str
     website: str
     url: str

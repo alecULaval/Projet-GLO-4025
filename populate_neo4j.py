@@ -1,7 +1,7 @@
 import csv
 import time
 
-from compose_flask.Restaurant import Restaurant
+from Restaurant import Restaurant
 from decouple import config
 from py2neo import Graph, Node, Relationship
 from typing import List
@@ -32,13 +32,13 @@ def validate_neo_connection(url, username, password):
 
 
 def load_csv_to_restaurant() -> List[Restaurant]:
-    restaurants = []
+    restaurants_data = []
 
     with open('restaurant_dataset.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            restaurants.append(Restaurant(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
-        return restaurants
+            restaurants.append(Restaurant(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
+        return restaurants_data
 
 
 validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
