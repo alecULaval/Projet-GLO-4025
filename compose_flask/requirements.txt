@@ -1,5 +1,0 @@
-flask
-redis
-pymongo
-neo4j
-numpy

@@ -1,0 +1,7 @@
+flask
+redis
+pymongo
+neo4j
+numpy
+py2neo
+python-decouple
