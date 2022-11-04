@@ -1,4 +1,5 @@
 import csv
+import json
 import time
 
 from Restaurant import Restaurant
@@ -34,7 +35,7 @@ def validate_neo_connection(url, username, password):
 def load_csv_to_restaurant() -> List[Restaurant]:
     restaurants_data = []
 
-    with open('restaurant_dataset.csv', 'r') as file:
+    with open('resources/restaurant_dataset.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -45,6 +46,19 @@ def load_csv_to_restaurant() -> List[Restaurant]:
 validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
 graph = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
 restaurant_graph = graph.begin()
+
+with open('resources/intersections.txt', 'r') as intersection_file,\
+        open('resources/geoJSONToronto2.geojson', 'r') as geojson_file:
+    reader = csv.reader(intersection_file)
+    next(reader)
+    for row in reader:
+        intersection_node = Node("Intersection", latitude=row[3], longitude=row[2])
+        restaurant_graph.create(intersection_node)
+# pour id1, id2:
+#   trouver tous les autres intersections dont fait parti id
+#   pour chaque autre intersection:
+#     si les coordonnées sont différentes:
+#       créer relation Intersection1-[:route {length=length de id}]->Intersection2
 
 restaurants = load_csv_to_restaurant()
 for restaurant in restaurants:
