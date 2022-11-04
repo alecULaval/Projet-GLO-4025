@@ -47,18 +47,25 @@ validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
 graph = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
 restaurant_graph = graph.begin()
 
-with open('resources/intersections.txt', 'r') as intersection_file,\
-        open('resources/json_toronto_reformated.json', 'r') as geojson_file:
+with open('resources/intersections_only_coords.csv', 'r') as intersection_file:
     reader = csv.reader(intersection_file)
     next(reader)
     for row in reader:
-        intersection_node = Node("Intersection", latitude=row[3], longitude=row[2])
+        intersection_node = Node("Intersection", latitude=row[1], longitude=row[0])
         restaurant_graph.create(intersection_node)
-# pour id1, id2:
-#   trouver tous les autres intersections dont fait parti id
-#   pour chaque autre intersection:
-#     si les coordonnées sont différentes:
-#       créer relation Intersection1-[:route {length=length de id}]->Intersection2
+
+with open('resources/routes.json', 'r') as routes_intersections_file, open('resources/json_toronto_reformated.json', 'r') as routes_data_file:
+    routes_intersections = json.load(routes_intersections_file)
+    routes_data = json.load(routes_data_file)
+    for road in routes_intersections:
+        road_length = routes_data[road]["length"]
+        intersection1_long = routes_intersections[road][0][0]
+        intersection1_lat = routes_intersections[road][0][1]
+        intersection2_long = routes_intersections[road][1][0]
+        intersection2_lat = routes_intersections[road][1][1]
+        restaurant_graph.run(f"CREATE (:Intersection {{latitude:{intersection1_lat}, longitude:{intersection1_long}}})"
+                             f"-[:Route {{id:{road}, length:{road_length}}}]->"
+                             f"(:Intersection {{latitude:{intersection2_lat}, longitude:{intersection2_long}}})")
 
 restaurants = load_csv_to_restaurant()
 for restaurant in restaurants:
