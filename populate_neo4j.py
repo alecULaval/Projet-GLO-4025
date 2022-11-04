@@ -48,7 +48,7 @@ graph = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
 restaurant_graph = graph.begin()
 
 with open('resources/intersections.txt', 'r') as intersection_file,\
-        open('resources/geoJSONToronto2.geojson', 'r') as geojson_file:
+        open('resources/json_toronto_reformated.json', 'r') as geojson_file:
     reader = csv.reader(intersection_file)
     next(reader)
     for row in reader:
