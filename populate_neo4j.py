@@ -35,11 +35,11 @@ def validate_neo_connection(url, username, password):
 def load_csv_to_restaurant() -> List[Restaurant]:
     restaurants_data = []
 
-    with open('resources/restaurant_dataset.csv', 'r') as file:
-        reader = csv.reader(file)
-        next(reader)
-        for row in reader:
-            restaurants_data.append(Restaurant(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
+    with open('resources/restos_cornwall_formatted.json', 'r') as file:
+        reader = json.load(file)
+        for resto in reader:
+            restaurant = reader[resto]
+            restaurants_data.append(Restaurant(resto, restaurant["types"], restaurant["address"], restaurant["name"], restaurant["latitude"], restaurant["longitude"]))
         return restaurants_data
 
 
@@ -69,13 +69,13 @@ with open('resources/routes.json', 'r') as routes_intersections_file, open('reso
 
 restaurants = load_csv_to_restaurant()
 for restaurant in restaurants:
-    restaurant_node = Node("Restaurant", address=restaurant.address, name=restaurant.name, phone=restaurant.phone,
-                           price_range=restaurant.price_range, website=restaurant.website, url=restaurant.url,
+    restaurant_node = Node("Restaurant", id=restaurant.id, address=restaurant.address, name=restaurant.name,
                            latitude=restaurant.latitude, longitude=restaurant.longitude)
-    type_node = Node("Type", name=restaurant.type)
     restaurant_graph.create(restaurant_node)
-    restaurant_graph.merge(type_node, primary_label="Type", primary_key="name")
-    restaurant_graph.create(Relationship(restaurant_node, "category_is", type_node))
+    for resto_type in restaurant.type:
+        type_node = Node("Type", name=resto_type)
+        restaurant_graph.merge(type_node, primary_label="Type", primary_key="name")
+        restaurant_graph.create(Relationship(restaurant_node, "category_is", type_node))
 
 
 graph.commit(restaurant_graph)
