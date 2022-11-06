@@ -9,7 +9,7 @@ services:
         depends_on:
             - mongo
             - neo4j
-        command: python3 -u populate_mongodb.py && python3 -u populate_neo4j.py
+        command: python3 -u populate_bd.py
 
     mongo:
         container_name: $MONGO_CONTAINER_NAME
