@@ -5,15 +5,13 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY populate_neo4j.py populate_neo4j.py
 COPY .env .env
-COPY mongodb.py mongodb.py
-COPY neo4jdb.py neo4jdb.py
+COPY populate_mongodb.py populate_mongodb.py
 COPY app.py app.py
 COPY Restaurant.py Restaurant.py
-COPY resources/restaurant_dataset.csv restaurant_dataset.csv
-COPY resources/intersections_only_coords.csv intersections_only_coords.csv
-COPY resources/json_toronto_reformated.json json_toronto_reformated.json
-COPY resources/routes.json routes.json
-COPY resources/restos_cornwall_formatted.json restos_cornwall_formatted.json
+COPY resources/json_cornwall_reformated.json resources/json_cornwall_reformated.json
+COPY resources/routes.json resources/routes.json
+COPY resources/restos_cornwall_formatted.json resources/restos_cornwall_formatted.json
+COPY resources/intersections.json resources/intersections.json
 
 
 RUN pip install -Ur requirements.txt

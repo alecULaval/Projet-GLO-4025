@@ -1,4 +1,3 @@
-import csv
 import json
 import time
 
@@ -47,14 +46,13 @@ validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
 graph = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
 restaurant_graph = graph.begin()
 
-with open('resources/intersections_only_coords.csv', 'r') as intersection_file:
-    reader = csv.reader(intersection_file)
-    next(reader)
-    for row in reader:
-        intersection_node = Node("Intersection", latitude=row[1], longitude=row[0])
+with open('resources/intersections.json', 'r') as intersection_file:
+    intersections = json.load(intersection_file)
+    for row in intersections:
+        intersection_node = Node("Intersection", id=row, latitude=intersections[row][1], longitude=intersections[row][0])
         restaurant_graph.create(intersection_node)
 
-with open('resources/routes.json', 'r') as routes_intersections_file, open('resources/json_toronto_reformated.json', 'r') as routes_data_file:
+with open('resources/routes.json', 'r') as routes_intersections_file, open('resources/json_cornwall_reformated.json', 'r') as routes_data_file:
     routes_intersections = json.load(routes_intersections_file)
     routes_data = json.load(routes_data_file)
     for road in routes_intersections:

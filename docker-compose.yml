@@ -9,10 +9,22 @@ services:
         depends_on:
             - mongo
             - neo4j
-        command: python3 -u populate_neo4j.py
+        command: python3 -u populate_mongodb.py && python3 -u populate_neo4j.py
 
     mongo:
-        image: mongo
+        container_name: $MONGO_CONTAINER_NAME
+        image: mongo:5
+        hostname: mongo
+        ports:
+            - "27017:27017"
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+            - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+            - MONGO_DB_NAME=$MONGO_DB_NAME
+            - MONGO_COLLECTION_RESTAURANTS=$MONGO_COLLECTION_RESTAURANTS
+            - MONGO_COLLECTION_INTERSECTIONS=$MONGO_COLLECTION_INTERSECTIONS
+            - MONGO_CONTAINER_NAME=$MONGO_CONTAINER_NAME
+
     neo4j:
         container_name: neo4j_restaurant
         image: neo4j:3.5.8
