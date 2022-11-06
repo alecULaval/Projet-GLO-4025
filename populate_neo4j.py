@@ -4,6 +4,7 @@ import time
 from Restaurant import Restaurant
 from decouple import config
 from py2neo import Graph, Node, Relationship
+from py2neo.matching import *
 from typing import List
 
 
@@ -55,6 +56,7 @@ def populate_neo4j():
             intersection_node = Node("Intersection", id=row, latitude=latitude, longitude=longitude)
             restaurant_graph.create(intersection_node)
 
+    nodes = NodeMatcher(restaurant_graph)
     with open('resources/routes.json', 'r') as routes_intersections_file, open(
             'resources/json_cornwall_reformated.json', 'r') as routes_data_file:
         routes_intersections = json.load(routes_intersections_file)
@@ -65,10 +67,9 @@ def populate_neo4j():
             intersection1_lat = str(routes_intersections[road][0][1])
             intersection2_long = str(routes_intersections[road][1][0])
             intersection2_lat = str(routes_intersections[road][1][1])
-            restaurant_graph.run(
-                f"MATCH (i1:Intersection {{latitude:{intersection1_lat}, longitude:{intersection1_long}}}),"
-                f"(i2:Intersection {{latitude:{intersection2_lat}, longitude:{intersection2_long}}})"
-                f"CREATE (i1)-[:Route {{id:{road}, length:{road_length}}}]->(i2)")
+            i1 = nodes.match("Intersection", latitude=intersection1_lat, longitude=intersection1_long).first()
+            i2 = nodes.match("Intersection", latitude=intersection2_lat, longitude=intersection2_long).first()
+            restaurant_graph.create(Relationship(i1, "route", i2, id=road, length=road_length))
 
     restaurants = load_csv_to_restaurant()
     for restaurant in restaurants:
@@ -81,4 +82,3 @@ def populate_neo4j():
             restaurant_graph.create(Relationship(restaurant_node, "category_is", type_node))
 
     graph.commit(restaurant_graph)
-    print("POPULATE NEO1")
