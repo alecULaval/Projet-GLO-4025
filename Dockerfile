@@ -7,6 +7,7 @@ COPY populate_neo4j.py populate_neo4j.py
 COPY .env .env
 COPY populate_mongodb.py populate_mongodb.py
 COPY populate_bd.py populate_bd.py
+COPY populate_restaurants_on_routes.py populate_restaurants_on_routes.py
 COPY app.py app.py
 COPY Restaurant.py Restaurant.py
 COPY resources/json_cornwall_reformated.json resources/json_cornwall_reformated.json

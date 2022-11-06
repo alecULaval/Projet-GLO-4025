@@ -3,8 +3,7 @@ import time
 
 from Restaurant import Restaurant
 from decouple import config
-from py2neo import Graph, Node, Relationship
-from py2neo.matching import *
+from py2neo import Graph, Node, NodeMatcher, Relationship
 from typing import List
 
 
@@ -24,6 +23,18 @@ def validate_neo_connection(url, username, password):
         validate_neo_connection(url=url, username=username, password=password)
 
 
+def initiate_neo4j():
+    INTERNAL_URL = config("NEO4J_INTERNAL_URL")
+
+    # We use split to split the NEO4J_AUTH formatted as "user/password"
+    USERNAME, PASSWORD = config("NEO4J_CREDENTIALS").split("/")
+
+    print('Waiting for servers connections')
+
+    validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
+    return Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
+
+
 def load_csv_to_restaurant() -> List[Restaurant]:
     restaurants_data = []
 
@@ -37,15 +48,7 @@ def load_csv_to_restaurant() -> List[Restaurant]:
 
 
 def populate_neo4j():
-    INTERNAL_URL = config("NEO4J_INTERNAL_URL")
-
-    # We use split to split the NEO4J_AUTH formatted as "user/password"
-    USERNAME, PASSWORD = config("NEO4J_CREDENTIALS").split("/")
-
-    print('Waiting for servers connections')
-
-    validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
-    graph = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
+    graph = initiate_neo4j()
     restaurant_graph = graph.begin()
 
     with open('resources/intersections.json', 'r') as intersection_file:
