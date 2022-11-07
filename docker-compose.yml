@@ -1,0 +1,50 @@
+version: '3.9'
+services:
+    app:
+        build: .
+        depends_on:
+            - mongo
+            - neo4j
+        command: python3 -u populate_bd.py
+
+    web:
+        build: .
+        ports:
+            - "8181:8181"
+        volumes:
+            - .:/code
+        depends_on:
+            - mongo
+            - neo4j
+        command: python3 app.py
+
+    mongo:
+        container_name: $MONGO_CONTAINER_NAME
+        image: mongo:5
+        hostname: mongo
+        ports:
+            - "27017:27017"
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME
+            - MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+            - MONGO_DB_NAME=$MONGO_DB_NAME
+            - MONGO_COLLECTION_RESTAURANTS=$MONGO_COLLECTION_RESTAURANTS
+            - MONGO_COLLECTION_INTERSECTIONS=$MONGO_COLLECTION_INTERSECTIONS
+            - MONGO_COLLECTION_ROUTES=$MONGO_COLLECTION_ROUTES
+            - MONGO_CONTAINER_NAME=$MONGO_CONTAINER_NAME
+
+    neo4j:
+        container_name: neo4j_restaurant
+        image: neo4j:3.5.8
+        hostname: neo
+        expose:
+            - 7474
+            - 7687
+
+        ports:
+            - "7474:7474"
+            - "7687:7687"
+
+        environment:
+            - NEO4J_AUTH=$NEO4J_CREDENTIALS
+            - NEO4J_INTERNAL_URL=$NEO4J_INTERNAL_URL
