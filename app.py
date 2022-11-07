@@ -8,6 +8,7 @@ from py2neo import Graph
 
 INTERNAL_URL = config("NEO4J_INTERNAL_URL")
 
+
 @app.route('/heartbeat', methods=["GET"])
 def heartbeat():
     ville_choisie = {
@@ -15,6 +16,7 @@ def heartbeat():
     }
 
     return json.dumps(ville_choisie)
+
 
 @app.route('/extracted_data', methods=["GET"])
 def extracted_data():
@@ -26,6 +28,7 @@ def extracted_data():
 
     return json.dumps(ville_choisie)
 
+
 @app.route('/transformed_data', methods=["GET"])
 def transformed_data():
     base_de_donnee = get_connection()
@@ -36,6 +39,7 @@ def transformed_data():
 
     return json.dumps(transformed_data)
 
+
 def get_connection():
     # We use split to split the NEO4J_AUTH formatted as "user/password"
     USERNAME = "neo4j"
@@ -43,6 +47,7 @@ def get_connection():
 
     base_de_donnee = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
     return base_de_donnee
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8181)

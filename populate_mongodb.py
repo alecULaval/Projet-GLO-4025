@@ -10,13 +10,15 @@ def initiate_mongodb():
     DB_NAME = config("MONGO_DB_NAME")
     RESTAURANT_COLLECTION = config("MONGO_COLLECTION_RESTAURANTS")
     INTERSECTION_COLLECTION = config("MONGO_COLLECTION_INTERSECTIONS")
+    ROUTE_COLLECTION = config("MONGO_COLLECTION_ROUTES")
 
     mongo_client = MongoClient(f'mongodb://{MONGO_CONTAINER_NAME}', username=USERNAME, password=PASSWORD)
     mongo_database = mongo_client[DB_NAME]
     restos = mongo_database[RESTAURANT_COLLECTION]
     intersections = mongo_database[INTERSECTION_COLLECTION]
+    routes = mongo_database[ROUTE_COLLECTION]
 
-    return restos, intersections
+    return restos, intersections, routes
 
 
 def populate_mongodb():
@@ -40,6 +42,12 @@ def populate_mongodb():
                      "location": create_geojson_point_from_strings(data[intersection][0], data[intersection][1])}
             intersections.insert_one(inter)
     intersections.create_index([("location", GEOSPHERE)])
+
+    with open('resources/json_cornwall_reformated.json', 'r') as file:
+        data = json.load(file)
+        for route in data:
+            road = {"_id": route, "length": data[route]["length"], "geometry": data[route]["geometry"]}
+            routes.insert_one(road)
 
 
 def create_geojson_point_from_strings(longitude, latitude):
