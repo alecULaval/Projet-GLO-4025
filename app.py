@@ -30,7 +30,7 @@ def extracted_data():
 def transformed_data():
     base_de_donnee = get_connection()
     transformed_data = {
-        "restaurants": base_de_donnee.run("MATCH (n:Type) RETURN n)").evaluate(),
+        "restaurants": base_de_donnee.run("MATCH (n:Type) RETURN n").evaluate(),
         "longueurCyclable": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN SUM(r.length)").evaluate()
     }
 
