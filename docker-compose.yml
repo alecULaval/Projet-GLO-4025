@@ -1,15 +1,22 @@
 version: '3.9'
 services:
+    app:
+        build: .
+        depends_on:
+            - mongo
+            - neo4j
+        command: python3 -u populate_bd.py
+
     web:
         build: .
         ports:
-            - "81:81"
+            - "8181:8181"
         volumes:
             - .:/code
         depends_on:
             - mongo
             - neo4j
-        command: python3 -u populate_bd.py
+        command: python3 app.py
 
     mongo:
         container_name: $MONGO_CONTAINER_NAME
