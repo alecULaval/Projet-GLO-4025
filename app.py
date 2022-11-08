@@ -1,6 +1,6 @@
 import json
 from decouple import config
-from flask import Flask
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
@@ -15,29 +15,34 @@ def heartbeat():
         "villeChoisie": "Cornwall"
     }
 
-    return json.dumps(ville_choisie)
+    return jsonify(ville_choisie)
 
 
 @app.route('/extracted_data', methods=["GET"])
 def extracted_data():
     base_de_donnee = get_connection()
-    ville_choisie = {
+    restaurant = {
         "nbRestaurants": base_de_donnee.run("MATCH (n:Restaurant) RETURN COUNT(n)").evaluate(),
         "nbSegments": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN COUNT(r)").evaluate()
     }
 
-    return json.dumps(ville_choisie)
+    return jsonify(restaurant)
 
 
 @app.route('/transformed_data', methods=["GET"])
 def transformed_data():
     base_de_donnee = get_connection()
+    res_dict = {}
+    res = base_de_donnee.run("MATCH (r:Restaurant)-[:category_is]->(t:Type) WITH  t,count(r) as types RETURN collect([t.name, types])").evaluate()
+    for r in res:
+        res_dict[r[0]] = r[1]
     transformed_data = {
-        "restaurants": base_de_donnee.run("MATCH (n:Type) RETURN n").evaluate(),
+        "restaurants": res_dict,
         "longueurCyclable": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN SUM(r.length)").evaluate()
     }
 
-    return json.dumps(transformed_data)
+    return jsonify(transformed_data)
+
 
 
 def get_connection():
