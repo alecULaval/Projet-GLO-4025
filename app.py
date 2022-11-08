@@ -1,6 +1,6 @@
 import json
 from decouple import config
-from flask import Flask
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
@@ -14,27 +14,32 @@ def heartbeat():
         "villeChoisie": "Cornwall"
     }
 
-    return json.dumps(ville_choisie)
+    return jsonify(json.dumps(ville_choisie))
 
 @app.route('/extracted_data', methods=["GET"])
 def extracted_data():
     base_de_donnee = get_connection()
-    ville_choisie = {
+    restaurant = {
         "nbRestaurants": base_de_donnee.run("MATCH (n:Restaurant) RETURN COUNT(n)").evaluate(),
         "nbSegments": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN COUNT(r)").evaluate()
     }
 
-    return json.dumps(ville_choisie)
+    return jsonify(json.dumps(restaurant))
 
 @app.route('/transformed_data', methods=["GET"])
 def transformed_data():
     base_de_donnee = get_connection()
+    res_dict = {}
+    res = base_de_donnee.run("MATCH (r:Restaurant)-[:category_is]->(t:Type) WITH  t,count(r) as types RETURN collect([t.name, types])").evaluate()
+    for r in res:
+        res_dict[r[0]] = r[1]
     transformed_data = {
-        "restaurants": base_de_donnee.run("MATCH (n:Type) RETURN n").evaluate(),
+        "restaurants": res,
         "longueurCyclable": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN SUM(r.length)").evaluate()
     }
 
-    return json.dumps(transformed_data)
+    return jsonify(json.dumps(transformed_data))
+
 
 def get_connection():
     # We use split to split the NEO4J_AUTH formatted as "user/password"
@@ -43,6 +48,7 @@ def get_connection():
 
     base_de_donnee = Graph(INTERNAL_URL, auth=(USERNAME, PASSWORD), secure=False)
     return base_de_donnee
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8181)
