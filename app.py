@@ -14,7 +14,7 @@ def heartbeat():
         "villeChoisie": "Cornwall"
     }
 
-    return jsonify(json.dumps(ville_choisie))
+    return jsonify(ville_choisie)
 
 @app.route('/extracted_data', methods=["GET"])
 def extracted_data():
@@ -24,7 +24,7 @@ def extracted_data():
         "nbSegments": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN COUNT(r)").evaluate()
     }
 
-    return jsonify(json.dumps(restaurant))
+    return jsonify(restaurant)
 
 @app.route('/transformed_data', methods=["GET"])
 def transformed_data():
@@ -34,11 +34,11 @@ def transformed_data():
     for r in res:
         res_dict[r[0]] = r[1]
     transformed_data = {
-        "restaurants": res,
+        "restaurants": res_dict,
         "longueurCyclable": base_de_donnee.run("MATCH p=()-[r:route]->() RETURN SUM(r.length)").evaluate()
     }
 
-    return jsonify(json.dumps(transformed_data))
+    return jsonify(transformed_data)
 
 
 def get_connection():
