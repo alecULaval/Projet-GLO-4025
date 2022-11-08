@@ -7,4 +7,4 @@
 - Section 3
     - Changement de la section 3.2 pour refléter la façon actuelle dont sont utilisées les bases de données.
 
-`**Svp attendre que la population des données soit terminée avant de faire les requêtes sur l'application Flask**`
+`**Svp attendre que la population des données soit terminée avant de faire les requêtes sur l'application Flask c-a-d quand app_1 exit avec le code 0**`
