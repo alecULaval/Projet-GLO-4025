@@ -22,7 +22,7 @@ def initiate_mongodb():
 
 
 def populate_mongodb():
-    restos, intersections = initiate_mongodb()
+    restos, intersections, routes = initiate_mongodb()
 
     with open('resources/restos_cornwall_formatted.json', 'r') as file:
         data = json.load(file)
