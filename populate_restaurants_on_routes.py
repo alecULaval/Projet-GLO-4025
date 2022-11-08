@@ -5,7 +5,7 @@ from populate_neo4j import initiate_neo4j
 
 
 def populate_restaurants_on_routes():
-    restos, intersections = initiate_mongodb()
+    restos, intersections, routes = initiate_mongodb()
     neo4j = initiate_neo4j()
     graph = neo4j.begin()
     nodes = NodeMatcher(graph)
