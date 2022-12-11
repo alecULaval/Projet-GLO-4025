@@ -1,7 +1,9 @@
+from populate_graph import initiate_graph
 from populate_neo4j import populate_neo4j
 from populate_mongodb import populate_mongodb
 from populate_restaurants_on_routes import populate_restaurants_on_routes
 
 populate_mongodb()
 populate_neo4j()
+initiate_graph()
 populate_restaurants_on_routes()
