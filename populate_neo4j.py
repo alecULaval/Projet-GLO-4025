@@ -73,6 +73,7 @@ def populate_neo4j():
             i1 = nodes.match("Intersection", latitude=intersection1_lat, longitude=intersection1_long).first()
             i2 = nodes.match("Intersection", latitude=intersection2_lat, longitude=intersection2_long).first()
             restaurant_graph.create(Relationship(i1, "route", i2, id=road, length=road_length))
+            restaurant_graph.create(Relationship(i2, "route", i1, id=road, length=road_length))
 
     restaurants = load_csv_to_restaurant()
     for restaurant in restaurants:
