@@ -47,9 +47,10 @@ services:
         environment:
             - NEO4J_AUTH=$NEO4J_CREDENTIALS
             - NEO4J_INTERNAL_URL=$NEO4J_INTERNAL_URL
-            - NEO4J_dbms_security_procedures_allowlist=algo.*,apoc.*
-            - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*
-        volumes:
-            - ./conf:/conf
-            - ./plugins:/plugins
+            - NEO4JLABS_PLUGINS=["graph-data-science"]
+            - NEO4J_dbms_security_procedures_allowlist=algo.*,apoc.*,gds.*
+            - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*,gds.*
+#        volumes:
+#            - ./conf:/var/lib/neo4j/conf
+#            - ./plugins:/plugins
 

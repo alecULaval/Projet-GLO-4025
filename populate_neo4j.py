@@ -54,8 +54,8 @@ def populate_neo4j():
     with open('resources/intersections.json', 'r') as intersection_file:
         intersections = json.load(intersection_file)
         for row in intersections:
-            latitude = intersections[row][1]
-            longitude = intersections[row][0]
+            latitude = float(intersections[row][1])
+            longitude = float(intersections[row][0])
             intersection_node = Node("Intersection", id=row, latitude=latitude, longitude=longitude)
             restaurant_graph.create(intersection_node)
 
@@ -66,10 +66,10 @@ def populate_neo4j():
         routes_data = json.load(routes_data_file)
         for road in routes_intersections:
             road_length = routes_data[road]["length"]
-            intersection1_long = str(routes_intersections[road][0][0])
-            intersection1_lat = str(routes_intersections[road][0][1])
-            intersection2_long = str(routes_intersections[road][1][0])
-            intersection2_lat = str(routes_intersections[road][1][1])
+            intersection1_long = float(routes_intersections[road][0][0])
+            intersection1_lat = float(routes_intersections[road][0][1])
+            intersection2_long = float(routes_intersections[road][1][0])
+            intersection2_lat = float(routes_intersections[road][1][1])
             i1 = nodes.match("Intersection", latitude=intersection1_lat, longitude=intersection1_long).first()
             i2 = nodes.match("Intersection", latitude=intersection2_lat, longitude=intersection2_long).first()
             restaurant_graph.create(Relationship(i1, "route", i2, id=road, length=road_length))

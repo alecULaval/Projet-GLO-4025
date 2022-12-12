@@ -26,7 +26,7 @@ def initiate_gds():
 
     print('Waiting for servers connections for gds')
 
-    # validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
+    validate_neo_connection(url=INTERNAL_URL, username=USERNAME, password=PASSWORD)
     return GraphDataScience(INTERNAL_URL, auth=(USERNAME, PASSWORD))
 
 
@@ -35,11 +35,14 @@ def initiate_graph():
     gds = initiate_gds()
     gds.graph.project(
         'myGraph',
-        'Intersection',
+        "Intersection",
         {
             "route": {
-            "properties": ['latitude', 'longitude'],
-            "relationshipProperties": 'length'
-        } }
+                "properties": ['latitude', 'longitude'],
+            } }
     )
-    print(gds.graph.get("offices"))
+    print(gds.graph.get("myGraph"))
+    # "47a00bff-2d7e-42b4-9fd7-2c167306c778"
+    # "95973d86-22d7-48d5-935b-1d925347cedc"
+    # MATCH(source:Intersection {id: '47a00bff-2d7e-42b4-9fd7-2c167306c778'}), (target:Intersection {id: '95973d86-22d7-48d5-935b-1d925347cedc'})
+

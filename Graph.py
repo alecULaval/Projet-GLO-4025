@@ -41,6 +41,6 @@ class Graph(object):
     #         relationshipProperties: 'length'
     #     }
     # )
-    #
+
     # dbms.security.procedures.whitelist = algo. *, apoc. *
     # dbms.security.procedures.unrestricted = algo. *, apoc. *

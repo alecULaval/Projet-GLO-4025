@@ -16,7 +16,7 @@ COPY resources/routes.json resources/routes.json
 COPY resources/restos_cornwall_formatted.json resources/restos_cornwall_formatted.json
 COPY resources/intersections.json resources/intersections.json
 COPY /plugins /plugins
-COPY /conf /conf
+# COPY /conf /conf
 
 
 RUN pip install -Ur requirements.txt
