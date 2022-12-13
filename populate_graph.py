@@ -1,3 +1,5 @@
+import json
+
 from graphdatascience import GraphDataScience
 import time
 from decouple import config
@@ -6,7 +8,7 @@ from decouple import config
 
 def validate_neo_connection(url, username, password):
     try:
-        print('Trying connection to neo')
+        print('Trying connection to neo gds')
         GraphDataScience(
             url,
             auth=(username, password),
@@ -30,18 +32,60 @@ def initiate_gds():
     return GraphDataScience(INTERNAL_URL, auth=(USERNAME, PASSWORD))
 
 
+def create_initial_graph(gds):
+    gds.run_cypher(
+    """
+    CALL gds.graph.project(
+        'myGraph',
+        'Intersection',
+        'route',
+        {
+            nodeProperties: ['latitude', 'longitude'],
+            relationshipProperties: 'length'
+        }
+    )
+    """)
+
+
+def create_all_possible_path(gds):
+    with open('resources/intersections.json', 'r') as intersection_file:
+        intersections = json.load(intersection_file)
+        for row in intersections:
+            s = "{id:'"+row+"'}"
+            s2 = '''
+            {
+                        sourceNode: source,
+                        relationshipWeightProperty: 'length',
+                        writeRelationshipType: 'PATH',
+                        writeNodeIds: true,
+                        writeCosts: true
+                    })
+            '''
+            gds.run_cypher(
+                f"""
+                    MATCH(source:Intersection {s})
+                    CALL gds.allShortestPaths.dijkstra.write('myGraph', {s2}
+                    YIELD relationshipsWritten
+                    RETURN relationshipsWritten
+                """
+            )
+
+
 
 def initiate_graph():
     gds = initiate_gds()
-    gds.graph.project(
-        'myGraph',
-        "Intersection",
-        {
-            "route": {
-                "properties": ['latitude', 'longitude'],
-            } }
-    )
-    print(gds.graph.get("myGraph"))
+    create_initial_graph(gds)
+    create_all_possible_path(gds)
+
+    # gds.graph.project(
+    #     'myGraph',
+    #     "Intersection",
+    #     {
+    #         "route": {
+    #             "properties": ['latitude', 'longitude'],
+    #         } }
+    # )
+    # print(gds.graph.get("myGraph"))
     # "47a00bff-2d7e-42b4-9fd7-2c167306c778"
     # "95973d86-22d7-48d5-935b-1d925347cedc"
     # MATCH(source:Intersection {id: '47a00bff-2d7e-42b4-9fd7-2c167306c778'}), (target:Intersection {id: '95973d86-22d7-48d5-935b-1d925347cedc'})
