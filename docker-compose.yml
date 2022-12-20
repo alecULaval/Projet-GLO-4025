@@ -1,5 +1,12 @@
 version: '3.9'
 services:
+#    app:
+#        build: .
+#        depends_on:
+#            - mongo
+#            - neo4j
+#        command: python3 -u populate_bd.py
+
     web:
         build: .
         ports:
@@ -31,7 +38,7 @@ services:
         image: neo4j:4.4.15
         hostname: neo
         volumes:
-            - "./neo4j-data:/var/lib/neo4j/data"
+            - "./neo4j-data:/data"
         expose:
             - 7474
             - 7687
