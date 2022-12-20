@@ -6,3 +6,4 @@ numpy
 py2neo
 python-decouple
 python-dotenv
+markdown
