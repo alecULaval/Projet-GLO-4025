@@ -28,7 +28,7 @@ services:
 
     neo4j:
         container_name: neo4j_restaurant
-        image: neo4j:3.5.8
+        image: neo4j:4.4.15
         hostname: neo
         volumes:
             - "./neo4j-data:/var/lib/neo4j/data"
@@ -43,3 +43,10 @@ services:
         environment:
             - NEO4J_AUTH=$NEO4J_CREDENTIALS
             - NEO4J_INTERNAL_URL=$NEO4J_INTERNAL_URL
+            - NEO4JLABS_PLUGINS=["graph-data-science"]
+            - NEO4J_dbms_security_procedures_allowlist=algo.*,apoc.*,gds.*
+            - NEO4J_dbms_security_procedures_unrestricted=algo.*,apoc.*,gds.*
+#        volumes:
+#            - ./conf:/var/lib/neo4j/conf
+#            - ./plugins:/plugins
+
