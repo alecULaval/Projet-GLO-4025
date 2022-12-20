@@ -1,6 +1,6 @@
 FROM python:3.8
 
-# ADD . /app
+ADD . /app
 WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY populate_neo4j.py populate_neo4j.py
@@ -16,8 +16,7 @@ COPY resources/routes.json resources/routes.json
 COPY resources/restos_cornwall_formatted.json resources/restos_cornwall_formatted.json
 COPY resources/intersections.json resources/intersections.json
 COPY /plugins /plugins
-# COPY /conf /conf
-
+VOLUME /data/db /data/configdb
 
 RUN pip install -Ur requirements.txt
 CMD python app.py
