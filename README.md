@@ -13,7 +13,7 @@ Désolé pour cet inconvenient et nous espérons que cela ne vous nuira pas trop
 
 ## Requêtes
 
-### GET /heartbeatdck
+### GET /heartbeat
 
 **Expected response format**
 ```
