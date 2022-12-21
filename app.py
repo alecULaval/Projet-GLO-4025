@@ -5,11 +5,13 @@ from decouple import config
 from flask import Flask, jsonify, request
 import markdown
 import markdown.extensions.fenced_code
-from geojson import MultiLineString, FeatureCollection, Point
+from geojson import MultiLineString, FeatureCollection, Point, Feature
 from py2neo import Graph
+from json import encoder
+
+encoder.FLOAT_REPR = lambda o: format(o, '.14f')
 
 app = Flask(__name__)
-
 
 INTERNAL_URL = config("NEO4J_INTERNAL_URL")
 
@@ -87,13 +89,13 @@ def starting_point():
             """
         multiple_intersections = db.run(query_neo4j).evaluate()
         # for intersections_index in range(len(multiple_intersections)):
-        response = {
-            "inter": multiple_intersections
-        }
 
-        return jsonify(response)
+        intersection = multiple_intersections[0]
+        random_index_to_select = random.randrange(0, len(multiple_intersections) - 1)
+        for i in range(0, len(multiple_intersections)):
+            if i == random_index_to_select:
+                intersection = multiple_intersections[i]
 
-        # intersection = multiple_intersections[random.randrange(0, len(multiple_intersections) - 1)]
     else:
         intersection = db.run("MATCH (n:Intersection) RETURN n LIMIT 1").evaluate()
 
@@ -115,18 +117,24 @@ def parcours():
     path_length = json_data["length"]
     number_of_stops = json_data["numberOfStops"]
     restaurant_types = json_data["type"]
-    starting_point = json_data["starting_point"]
+    starting_point = json_data["startingPoint"]
     coord_list = starting_point["coordinates"]
     latitude = coord_list[0]
     longitude = coord_list[1]
 
-    intersection_filters = "{latitude: " + str(latitude) + ", longitude: " + str(longitude) + "}"
+    """
+    response_test = {"types": restaurant_types, "length": path_length, "numberOfStops": number_of_stops,
+                "coordinates": coord_list}
+
+    return jsonify(response_test)
+    """
+
+    intersection_filters = "latitude:{filter_lat}, longitude: {filter_lon}".format(filter_lat=latitude,
+                                                                                   filter_lon=longitude)
     max_length = path_length + 100
     min_length = path_length - 100
 
-
-    #query = f"MATCH (n:Intersection) WHERE n.latitude = {coord_list[0]}"
-
+    # query = f"MATCH (n:Intersection) WHERE n.latitude = {coord_list[0]}"
     neo4j_query = """MATCH p=()-[r:PATH]->() WHERE r.totalCost > {min_length} AND r.totalCost < {max_length}
     UNWIND nodes(p) AS node
     MATCH (i:Intersection {intersection_filters} is_closest_to]-(res:Restaurant)-[:category_is]->(c:Type)
@@ -141,8 +149,27 @@ def parcours():
 
     neo4j_response = db.run(neo4j_query).evaluate()
 
-    # response = FeatureCollection()
-    response = neo4j_response
+    #On doit boucler sur les nodes du Path pour trouver les restaurants puis les rajouter a la liste de feature.
+    #On doit aussi creer un MultiLineString avec les coordonnees de toutes les nodes puis rajouter ce feature
+
+    features = []
+
+    point_debut_segment_test = (45.02091902673723, -74.70385047566093)
+    point_fin_segment_test = (45.12091902673723, -74.80385047566093)
+    segment1_test = [point_debut_segment_test, point_fin_segment_test]
+    liste_segments = []
+    liste_segments.append(segment1_test)
+    liste_segments.append(segment1_test)
+    liste_segments.append(segment1_test)
+
+    #Ceci fait a la fin de la boucle sur les nodes des paths
+    multiLine_feature = Feature(geometry=MultiLineString(liste_segments))
+    starting_point_feature = Feature(geometry=Point(45.02091902673723, -74.70385047566093))
+    starting_point_feature['properties'] = {"name": "Bob", "type": "Le Bricoleur"}
+    features.append(starting_point_feature)
+    features.append(multiLine_feature)
+
+    response = FeatureCollection(features)
 
     return jsonify(response)
 
