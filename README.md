@@ -1,8 +1,19 @@
 # Projet-GLO-4035
 
+# ************DISCLAIMER SUR LE TEMPS DE BUILD *********
+
+Après des heures et des heures d’essais avec les volumes de Docker, nous sommes totalement incapables de trouver une manière pour persister les données sans constamment repeupeler au moment de faire docker compose up. Dans tous nos essais, la base de donnée Neo4j était toujours vide. 
+
+Cela a aussi GRANDEMENT compliqué les processus de développement … une tâche qui aurait du prendre quelques secondes prenait maintenant plusieurs dizaines de minutes (repeupalage, pas de mode debug, lag intense sur la VM du cours malgre beaucoup de ressources  …). …), donc la qualité du code et des requêtes (notamment pour GET/parcours) laisse à desirer.
+
+Ainsi, …chaque Docker compose up est encore long, désolé (5 à 10 minutes en moyenne selon l’ordinateur …). Par contre, cela permet de montrer les requêtes que nous avons implémentées et le fonctionnement globale de l’application. 
+
+Désolé pour cet inconvenient et nous espérons que cela ne vous nuira pas trop pour la correction.
+
+
 ## Requêtes
 
-### GET /heartbeat
+### GET /heartbeatdck
 
 **Expected response format**
 ```
@@ -219,7 +230,18 @@ This file
   }
 }
 ```
-**Response Exemple**
+**Response exemple**
+```
+{
+    "starting_point": {
+        "coordinates": [
+            45.01561,
+            -74.739338
+        ],
+        "type": "Point"
+    }
+}
+```
 
 ### GET /parcours
 
@@ -286,6 +308,97 @@ This file
       }
     }
   ]
+}
+```
+**Response exemple**
+```
+{
+    "features": [
+        {
+            "geometry": {
+                "coordinates": [
+                    45.020919,
+                    -74.70385
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "name": "McDonalds",
+                "type": "Burger"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    45.024237,
+                    -74.714329
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "name": "The Shack",
+                "type": "Pizza"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    45.019472,
+                    -74.720799
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "name": "Pacini",
+                "type": "Italian"
+            },
+            "type": "Feature"
+        },
+        {
+            "geometry": {
+                "coordinates": [
+                    [
+                        [
+                            45.020919,
+                            -74.70385
+                        ],
+                        [
+                            45.120919,
+                            -74.80385
+                        ]
+                    ],
+                    [
+                        [
+                            45.030986,
+                            -74.70433
+                        ],
+                        [
+                            45.129556,
+                            -74.809486
+                        ]
+                    ],
+                    [
+                        [
+                            45.028544,
+                            -74.719083
+                        ],
+                        [
+                            45.120919,
+                            -74.810438
+                        ]
+                    ]
+                ],
+                "type": "MultiLineString"
+            },
+            "properties": {
+                "length": 12345
+            },
+            "type": "Feature"
+        }
+    ],
+    "type": "FeatureCollection"
 }
 ```
 

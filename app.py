@@ -16,6 +16,41 @@ app = Flask(__name__)
 INTERNAL_URL = config("NEO4J_INTERNAL_URL")
 
 
+def get_hardcoded_feature_collection():
+    features = []
+    liste_segments = []
+    point_debut_segment1 = (45.02091902673723, -74.70385047566093)
+    point_debut_segment2 = (45.03098593467473, -74.70432986437286)
+    point_debut_segment3 = (45.02854398654377, -74.71908347589346)
+    point_fin_segment1 = (45.12091902673723, -74.80385047566093)
+    point_fin_segment2 = (45.12955643743783, -74.80948632768787)
+    point_fin_segment3 = (45.12091902673723, -74.81043827634766)
+    segment1 = [point_debut_segment1, point_fin_segment1]
+    segment2 = [point_debut_segment2, point_fin_segment2]
+    segment3 = [point_debut_segment3, point_fin_segment3]
+    liste_segments.append(segment1)
+    liste_segments.append(segment2)
+    liste_segments.append(segment3)
+
+    #Ceci fait a la fin de la boucle sur les nodes des paths
+    multiLine_feature = Feature(geometry=MultiLineString(liste_segments))
+    multiLine_feature['properties'] = {"length": 12345}
+
+    resto1_feature = Feature(geometry=Point((45.02091902673723, -74.70385047566093)))
+    resto2_feature = Feature(geometry=Point((45.02423704238904, -74.71432896432786)))
+    resto3_feature = Feature(geometry=Point((45.01947239748320, -74.72079850934897)))
+    resto1_feature['properties'] = {"name": "McDonalds", "type": "Burger"}
+    resto2_feature['properties'] = {"name": "The Shack", "type": "Pizza"}
+    resto3_feature['properties'] = {"name": "Pacini", "type": "Italian"}
+    features.append(resto1_feature)
+    features.append(resto2_feature)
+    features.append(resto3_feature)
+    features.append(multiLine_feature)
+
+    response = FeatureCollection(features)
+    return response
+
+
 @app.route('/heartbeat', methods=["GET"])
 def heartbeat():
     ville_choisie = {
@@ -131,60 +166,32 @@ def parcours():
 
     #Temporaire pour le cas avec des types vides
     if len(restaurant_types) ==0:
-        restaurant_types = ["pizza"]
+        restaurant_types = ["Pizza"]
 
-    """
-    response_test = {"types": restaurant_types, "length": path_length, "numberOfStops": number_of_stops,
-                "coordinates": coord_list}
+    response = get_hardcoded_feature_collection()
 
-    return jsonify(response_test)
-    """
-
-
-    #On doit boucler sur les nodes du Path pour trouver les restaurants puis les rajouter a la liste de feature.
-    #On doit aussi creer un MultiLineString avec les coordonnees de toutes les nodes puis rajouter ce feature
-    features = []
-    point_debut_segment_test = (45.02091902673723, -74.70385047566093)
-    point_fin_segment_test = (45.12091902673723, -74.80385047566093)
-    segment1_test = [point_debut_segment_test, point_fin_segment_test]
-    liste_segments = []
-    liste_segments.append(segment1_test)
-    liste_segments.append(segment1_test)
-    liste_segments.append(segment1_test)
-
-    #Ceci fait a la fin de la boucle sur les nodes des paths
-    multiLine_feature = Feature(geometry=MultiLineString(liste_segments))
-    multiLine_feature['properties'] = {"length": 12345}
-    starting_point_feature = Feature(geometry=Point((45.02091902673723, -74.70385047566093)))
-    starting_point_feature['properties'] = {"name": "Bob", "type": "Le Bricoleur"}
-    features.append(starting_point_feature)
-    features.append(multiLine_feature)
-
-    response = FeatureCollection(features)
-
-    intersection_filters = "{" + "latitude:{filter_lat}, longitude: {filter_lon}".format(filter_lat=latitude,
-                                                                                   filter_lon=longitude) + "}"
-    max_length = path_length + 100
-    min_length = path_length - 100
+    #intersection_filters = "{" + "latitude:{filter_lat}, longitude: {filter_lon}".format(filter_lat=latitude,
+                                                                                   #filter_lon=longitude) + "}"
+    #max_length = path_length + 100
+    #min_length = path_length - 100
 
     # query = f"MATCH (n:Intersection) WHERE n.latitude = {coord_list[0]}"
-    neo4j_query = """MATCH p=()-[r:PATH]->() WHERE r.totalCost > {min_length} AND r.totalCost < {max_length}
-    UNWIND nodes(p) AS node
-    MATCH (i:Intersection {intersection_filters})<-[is_closest_to]-(res:Restaurant)-[:category_is]->(c:Type)
-    WHERE (c.name IN {restaurant_types})
-    WITH  COLLECT(res) as result, p as paths, count(res) AS num
-    WHERE num = {number_of_stops}
-    RETURN paths, [re in result | re.name] as resto LIMIT 1""".format(intersection_filters=intersection_filters,
-                                                                      restaurant_types=restaurant_types,
-                                                                      max_length=max_length,
-                                                                      min_length=min_length,
-                                                                      number_of_stops=number_of_stops)
+    #neo4j_query = """MATCH p=()-[r:PATH]->() WHERE r.totalCost > {min_length} AND r.totalCost < {max_length}
+    #UNWIND nodes(p) AS node
+    #MATCH (i:Intersection {intersection_filters})<-[is_closest_to]-(res:Restaurant)-[:category_is]->(c:Type)
+    #WHERE (c.name IN {restaurant_types})
+    #WITH  COLLECT(res) as result, p as paths, count(res) AS num
+    #WHERE num = {number_of_stops}
+    #RETURN paths, [re in result | re.name] as resto LIMIT 1""".format(intersection_filters=intersection_filters,
+                                                                      #restaurant_types=restaurant_types,
+                                                                      #max_length=max_length,
+                                                                      #min_length=min_length,
+                                                                      #number_of_stops=number_of_stops)
 
-    neo4j_response = db.run(neo4j_query).evaluate()
-
+    #neo4j_response = db.run(neo4j_query).evaluate()
     #return jsonify(neo4j_response)
-    return jsonify(response)
 
+    return jsonify(response)
 
 def get_connection():
     # We use split to split the NEO4J_AUTH formatted as "user/password"
