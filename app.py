@@ -182,8 +182,8 @@ def parcours():
 
     neo4j_response = db.run(neo4j_query).evaluate()
 
-    return jsonify(neo4j_response)
-    #return jsonify(response)
+    #return jsonify(neo4j_response)
+    return jsonify(response)
 
 
 def get_connection():
